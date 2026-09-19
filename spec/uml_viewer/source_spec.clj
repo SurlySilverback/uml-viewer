@@ -2,7 +2,8 @@
   (:require [clojure.string :as str]
             [speclj.core :refer :all]
             [uml-viewer.source :as source]
-            [uml-viewer.clojure-language.source-clojure :as clj-src]))
+            [uml-viewer.clojure-language.source-clojure :as clj-src]
+            [uml-viewer.gdscript-language.source-gdscript]))
 
 (describe "source protocol"
   (it "returns nil for an unknown language"
@@ -16,7 +17,17 @@
       (should= "src/uml_viewer/domain/geom.clj" (:file found))
       (should (str/starts-with? (:body found) "(ns uml-viewer.domain.geom"))
       (should (str/includes? (:body found) "(defn rect"))
-      (should (pos? (:line found))))))
+      (should (pos? (:line found)))))
+
+  (it "dispatches gdscript by :lang"
+    (let [found (source/member-source {:lang :gdscript
+                                       :ns "spec/examples/gdscript/enemies/slime"
+                                       :name "hop"})]
+      (should= :gdscript (:lang found))
+      (should= "spec/examples/gdscript/enemies/slime.gd" (:file found))
+      (should (str/starts-with? (:body found) "class_name Slime"))
+      (should (str/includes? (:body found) "func hop"))
+      (should= 7 (:line found)))))
 
 (describe "clojure extractor"
   (it "maps a namespace to a source file under src/"
