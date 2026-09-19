@@ -254,12 +254,22 @@ with `(graph/register! :java my-java-scanner)`. The scanner must satisfy
 Classes are `{:id :name :ns :stereotype}`. Edges are `{:from :to :kind}`
 (`:dependency` or `:implements`). The policy layer is language-neutral.
 
-**Clojure** (`uml-viewer.clojure-language.graph-clojure`) is the only
-implementation today: it reads `ns` forms (including prefix lists),
-`requiring-resolve` of a quoted var (including nested calls), `defprotocol`,
-`defrecord`, and `deftype`. Java or C need a different parser; do not
-special-case languages in `policy` or `ir-generator`. Main constructs the
-implementation and passes it in.
+**Clojure** (`uml-viewer.clojure-language.graph-clojure`) reads `ns` forms
+(including prefix lists), `requiring-resolve` of a quoted var (including
+nested calls), `defprotocol`, `defrecord`, and `deftype`.
+
+**GDScript** (`uml-viewer.gdscript-language.graph-gdscript`) reads `.gd`
+files under `:src`. One class per script; `class_name` is the display name.
+Folders become dotted ids so the hierarchical viewer still drills by layer
+(`enemies/slime.gd` → `:enemies.slime`). `extends` is `:inheritance`.
+`preload` of another `.gd` script is `:dependency`. Godot engine classes
+and paths outside the scanned tree are foreign, the same way external
+Clojure requires are. `:prefix` is unused; the tree is the folders under
+`:src`. Point a policy at a Godot tree with `:lang :gdscript` and `:src`
+set to the project (or a scripts folder), then `clj -M:ir that.policy.edn`.
+
+Do not special-case languages in `policy` or `ir-generator`. Main looks up
+the registered scanner from `:lang` (default `:clojure`).
 
 ## IR
 
@@ -368,14 +378,21 @@ extractor must satisfy `LanguageSource`:
 | `extract` | slice that member out of the file text |
 | `title` | window title |
 
-**Clojure** (`uml-viewer.clojure-language.source-clojure`) is the only
-implementation today: it maps `:ns` to `src/...clj` (or `.cljc` / `.cljs`)
-and finds the top-level `(defn name …)` / `(defn- name …)` so the window can
-jump to that line. That locate/line step is not enough for Java or C — those
-need a parser or language server, and a richer identity (`:class`,
-`:signature`, `:file`). The protocol is the seam; do not special-case
-languages in the class card. Main constructs the extractor and passes it to
-Core.
+**Clojure** (`uml-viewer.clojure-language.source-clojure`) maps `:ns` to
+`src/...clj` (or `.cljc` / `.cljs`) and finds the top-level
+`(defn name …)` / `(defn- name …)` so the window can jump to that line.
+
+**GDScript** (`uml-viewer.gdscript-language.source-gdscript`) maps `:ns` to
+a `.gd` file (slash path or dotted id, with or without the suffix) and
+finds the top-level `func` / `static func` / `async func`, including
+names that start with `_`. Clicking the module name opens the file at the
+top (`:line` omitted). Call
+`(source/member-source {:lang :gdscript :ns "enemies/slime" :name "hop"})`.
+
+Java or C still need a parser or language server, and a richer identity
+(`:class`, `:signature`, `:file`). The protocol is the seam; do not
+special-case languages in the class card. Main constructs the extractor
+and passes it to Core.
 
 Quil stays in `adapters.draw` and `adapters.sketch`. The rest of the engine
 does not depend on Processing.

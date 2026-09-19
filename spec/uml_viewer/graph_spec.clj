@@ -2,7 +2,8 @@
   (:require [clojure.java.io :as io]
             [speclj.core :refer :all]
             [uml-viewer.graph :as graph]
-            [uml-viewer.clojure-language.graph-clojure]))
+            [uml-viewer.clojure-language.graph-clojure]
+            [uml-viewer.gdscript-language.graph-gdscript]))
 
 (defn- spit-ns [dir rel content]
   (let [f (io/file dir rel)]
@@ -18,7 +19,12 @@
     (let [g (graph/scan-project :clojure "src" {:prefix "uml-viewer"})]
       (should (some #(= :source (:id %)) (:classes g)))
       (should (some #(= :interface (:stereotype %))
-                    (filter #(= :source (:id %)) (:classes g)))))))
+                    (filter #(= :source (:id %)) (:classes g))))))
+
+  (it "dispatches gdscript by :lang"
+    (let [g (graph/scan-project :gdscript "spec/examples/gdscript" {})]
+      (should (some #(= :enemies.slime (:id %)) (:classes g)))
+      (should (some #(= :inheritance (:kind %)) (:edges g))))))
 
 (describe "clojure graph"
   (it "reads requires, protocols, and record implementations from a tree"

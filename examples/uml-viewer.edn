@@ -7,22 +7,34 @@
   [:application.document :domain.hierarchy] :association,
   [:main.ir-generator :clojure-language.graph-clojure] :association,
   [:application.document :engine.compose] :association,
+  [:main.uml-viewer :gdscript-language.source-gdscript] :association,
   [:engine.compose :engine.layout] :association,
+  [:main.ir-generator :gdscript-language.graph-gdscript] :association,
   [:engine.compose :engine.route] :association,
   [:adapters.core :adapters.sketch] :association,
   [:main :application] :association,
   [:main.uml-viewer :clojure-language.source-clojure] :association,
   [:main :clojure-language] :association,
   [:main.ir-generator :application.ir-generator] :association,
-  [:main :adapters] :association},
+  [:main :adapters] :association,
+  [:main :gdscript-language] :association},
  :omit-edges [],
  :levels
- [[:domain :source :graph :clojure-language]
+ [[:domain :source :graph :clojure-language :gdscript-language]
   [:engine]
   [:application]
   [:adapters]
   [:main]],
- :order [:main :adapters :application :engine :source :graph :clojure-language :domain],
+ :order
+ [:main
+  :adapters
+  :application
+  :engine
+  :source
+  :graph
+  :clojure-language
+  :gdscript-language
+  :domain],
  :edges
  [{:from :main.uml-viewer, :to :adapters.core, :kind :dependency}
   {:from :clojure-language.source-clojure, :to :source, :kind :implements}
@@ -34,6 +46,7 @@
   {:from :main.ir-generator, :to :clojure-language.graph-clojure, :kind :dependency}
   {:from :application.detail, :to :application.overlay, :kind :dependency}
   {:from :engine.layout, :to :domain.geom, :kind :dependency}
+  {:from :gdscript-language.graph-gdscript, :to :graph, :kind :implements}
   {:from :adapters.sketch, :to :application.events, :kind :dependency}
   {:from :application.document, :to :engine.compose, :kind :dependency}
   {:from :application.document, :to :domain.ir, :kind :dependency}
@@ -47,10 +60,14 @@
   {:from :application.events, :to :application.document, :kind :dependency}
   {:from :adapters.draw, :to :engine.hit, :kind :dependency}
   {:from :clojure-language.graph-clojure, :to :graph, :kind :implements}
+  {:from :main.uml-viewer, :to :gdscript-language.source-gdscript, :kind :dependency}
   {:from :adapters.draw, :to :domain.geom, :kind :dependency}
   {:from :application.events, :to :domain.hierarchy, :kind :dependency}
+  {:from :main.ir-generator, :to :graph, :kind :dependency}
   {:from :engine.compose, :to :engine.layout, :kind :dependency}
+  {:from :main.ir-generator, :to :gdscript-language.graph-gdscript, :kind :dependency}
   {:from :engine.compose, :to :engine.route, :kind :dependency}
+  {:from :gdscript-language.source-gdscript, :to :source, :kind :implements}
   {:from :application.events, :to :engine.layout, :kind :dependency}
   {:from :adapters.sketch, :to :quil, :kind :dependency}
   {:from :engine.compose, :to :domain.geom, :kind :dependency}
@@ -161,6 +178,14 @@
   {:id :engine.route,
    :name "EngineRoute",
    :ns "uml-viewer.engine.route",
+   :stereotype nil}
+  {:id :gdscript-language.graph-gdscript,
+   :name "GdscriptLanguageGraphGdscript",
+   :ns "uml-viewer.gdscript-language.graph-gdscript",
+   :stereotype nil}
+  {:id :gdscript-language.source-gdscript,
+   :name "GdscriptLanguageSourceGdscript",
+   :ns "uml-viewer.gdscript-language.source-gdscript",
    :stereotype nil}
   {:id :graph, :name "Graph", :ns "uml-viewer.graph", :stereotype :interface}
   {:id :main.ir-generator,

@@ -1,6 +1,7 @@
 (ns uml-viewer.main.uml-viewer
   (:require [uml-viewer.adapters.core :as core]
-            [uml-viewer.clojure-language.source-clojure :as clj-source])
+            [uml-viewer.clojure-language.source-clojure :as clj-source]
+            [uml-viewer.gdscript-language.source-gdscript])
   (:gen-class))
 
 (defn -main [& args]
